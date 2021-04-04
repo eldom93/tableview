@@ -1,4 +1,20 @@
+
+(function () {
 $(document).ready(function () {
+    $(".closebtn").click(function () {
+        closeNav();
+    });
+    $(".openbtn").click(function () {
+        openNav();
+    });
+    $('input.toggle-vis').on('click', function (e) {
+        //e.preventDefault();
+        // Get the column API object
+        var column = table.column($(this).attr('data-column'));
+        // Toggle the visibility
+        column.visible(!column.visible(), false);
+    });
+   
     var name = 'name';
     var days = 7;
 
@@ -32,8 +48,48 @@ $(document).ready(function () {
         }
         return "";
     };
+    
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById('openbtn').style.visibility = "hidden";
+    };
 
-    $('#example').DataTable({
+    function closeNav() {
+        console.log('closenav func called');
+        document.getElementById("mySidenav").style.width = "0";
+        document.getElementById("main").style.marginLeft = "0";
+        document.getElementById('openbtn').style.visibility = "visible";
+    };
+    var table = $('#example').DataTable({
+        language: {
+            search: "",
+            searchPlaceholder: "Filter – All Pages"
+        },
+        columnDefs: [ {
+            orderable: false,
+            className: 'select-checkbox',
+            targets:   0
+        } ],
+        select: {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+        column: [
+            {
+                data: null,
+                defaultContent: '',
+                className: 'select-checkbox',
+                orderable: false
+            },
+            { data: 'Name' },
+            { data: 'Position' },
+            { data: 'Office' },
+            { data: 'Age' },
+            { data: 'Date' },
+            { data: 'Salary' }
+        ],
         initComplete: function () {
             this.api().columns().every(function () {
                 var column = this;
@@ -95,14 +151,14 @@ $(document).ready(function () {
             let dte = d.getTime();
             d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
             var expires = "expires=" + d.toUTCString();
-            var defaultTableView = {"time":dte,"start":0,"length":10,"order":[[0,"asc"]],"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true},"columns":[{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}},{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}},{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}},{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}},{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}},{"visible":true,"search":{"search":"","smart":true,"regex":false,"caseInsensitive":true}}],"user":"user","table_name":"name"};
+            var defaultTableView = { "time": dte, "start": 0, "length": 10, "order": [[0, "asc"]], "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true }, "columns": [{ "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }, { "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }, { "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }, { "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }, { "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }, { "visible": true, "search": { "search": "", "smart": true, "regex": false, "caseInsensitive": true } }], "user": "user", "table_name": "name" };
             var defaultData = JSON.stringify(defaultTableView);
-            if(dta === ""){
+            if (dta === "") {
                 console.log('cookie cleared');
                 document.cookie = 'DataTables_' + settings.sInstance + name + "=" + defaultData + ";" + expires + ";path=/" + ";", secure = false;
                 dta = getCookie('DataTables_' + settings.sInstance + name);
                 return JSON.parse(dta);
-            }else{
+            } else {
                 return JSON.parse(dta);
             }
         },
@@ -111,4 +167,35 @@ $(document).ready(function () {
             data.table_name = 'name';
         }
     });
+
+
 });
+table.on('select', function (e, dt, type, indexes) {
+    var count = table.rows({
+        selected: true
+    }).count();
+    if (count === 0) {
+        selectwrapper.style.visibility = 'hidden';
+    } else {
+        selectwrapper.style.visibility = 'visible';
+    }
+    // if ( type === 'row' ) {
+    //  var data = table.rows( indexes ).data().pluck( 'id' );
+    // do something with the ID of the selected items
+    // }
+});
+table.on('deselect', function (e, dt, type, indexes) {
+    var count = table.rows({
+        selected: true
+    }).count();
+    if (count === 0) {
+        selectwrapper.style.visibility = 'hidden';
+    } else {
+        selectwrapper.style.visibility = 'visible';
+    }
+    // if ( type === 'row' ) {
+    //  var data = table.rows( indexes ).data().pluck( 'id' );
+    // do something with the ID of the selected items
+    // }
+});
+})();
